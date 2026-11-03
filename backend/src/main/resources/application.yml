@@ -1,0 +1,75 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: taskflow-backend
+
+  # ==================== 数据源配置 ====================
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # MySQL 8 必须指定时区 serverTimezone，否则中文会乱码/报时区异常
+    url: jdbc:mysql://localhost:3306/taskflow?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    # ⚠️ 账号密码请用环境变量注入，不要把真实密码提交到仓库。
+    #    本地开发请复制 application-local.yml（该文件已被 .gitignore 忽略）。
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+  # ==================== 文件上传大小限制 ====================
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: always
+
+# ==================== MyBatis-Plus ====================
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.taskflow.entity
+  configuration:
+    map-underscore-to-camel-case: true      # 下划线转驼峰
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl   # 控制台打印 SQL，方便学习调试
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto                          # 主键自增
+      logic-delete-field: deleted             # 逻辑删除字段
+      logic-delete-value: 1                   # 已删除
+      logic-not-delete-value: 0               # 未删除
+
+# ==================== 业务自定义配置 ====================
+taskflow:
+  jwt:
+    # ⚠️ 生产环境务必改成随机长字符串，并通过环境变量 TASKFLOW_JWT_SECRET 注入。
+    #    默认值仅供本地开发，切勿用于生产。
+    secret: ${TASKFLOW_JWT_SECRET:taskflow-jwt-secret-key-2025-please-change-it-in-production}
+    # 令牌有效期（毫秒），默认 7 天
+    expire: 604800000
+    header: Authorization
+    prefix: "Bearer "
+  ticket:
+    # 各优先级工单的 SLA 处理时长（小时）
+    sla-hours:
+      1: 24
+      2: 72
+      3: 168
+      4: 336
+
+# ==================== 打印启动信息 ====================
+logging:
+  level:
+    root: info
+    com.taskflow: debug

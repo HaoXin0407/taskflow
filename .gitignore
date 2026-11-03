@@ -1,0 +1,56 @@
+# ==================== 依赖 ====================
+node_modules/
+target/
+.pnpm-store/
+
+# ==================== 构建产物 ====================
+dist/
+build/
+*.jar
+*.war
+*.zip
+*.tar.gz
+
+# 由 Markdown 生成的 PDF（体积大且会随 .md 改动而过期，
+#仓库只保留 .md，GitHub 会自动渲染）
+*.pdf
+
+# ==================== 本地配置（含密码/密钥，绝不能提交）===================
+# application.yml 里已改用 ${环境变量:默认值} 形式，
+# 真实的数据库密码与 JWT 密钥请放在下面这些文件里
+application-local.yml
+application-local.yaml
+application-local.properties
+*.local.yml
+.env
+.env.local
+.env.*.local
+
+# ==================== IDE ====================
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+.factorypath
+
+# ==================== 日志 ====================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==================== 系统文件 ====================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==================== 其他 ====================
+*.bak
+*.tmp
+*.swp

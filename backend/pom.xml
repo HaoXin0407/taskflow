@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.taskflow</groupId>
+    <artifactId>taskflow-backend</artifactId>
+    <version>1.0.0</version>
+    <name>taskflow-backend</name>
+    <description>TaskFlow 企业级智能工单流转与审批协同平台</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <mybatis-plus.version>3.5.7</mybatis-plus.version>
+        <jjwt.version>0.12.5</jjwt.version>
+        <knife4j.version>4.5.0</knife4j.version>
+        <hutool.version>5.8.27</hutool.version>
+        <!--
+            Lombok 版本说明：
+            必须 >= 1.18.30，否则在 JDK 17 + Maven 3.10 下会报
+            "Fatal error compiling: java.lang.ExceptionInInitializerError:
+             com.sun.tools.javac.code.TypeTag :: UNKNOWN"
+            —— 原因是旧版 Lombok 访问 JDK 内部 API 被模块化系统（JPMS）挡住。
+            1.18.42 是验证过与 Spring Boot 3.2 / JDK 17 兼容的稳定版本。
+        -->
+        <lombok.version>1.18.42</lombok.version>
+    </properties>
+
+    <dependencies>
+        <!-- Web 基础：SpringMVC / 内嵌 Tomcat / Jackson -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 参数校验 @NotBlank @Max 等 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- Spring Security 6：认证与授权框架 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- AOP：用于操作日志切面 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <!-- MyBatis-Plus：单表 CRUD 零 SQL，分页/逻辑删除开箱即用 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+
+        <!-- MySQL 8 驱动 -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- JWT：生成与校验登录令牌 -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- 接口文档 Knife4j（访问 http://localhost:8080/api/doc.html） -->
+        <!-- ⚠️ artifactId 必须是 knife4j-openapi3-jakarta-spring-boot-starter
+             少写 -spring-boot-starter 后缀在中央仓库不存在该构件，
+             会报 Could not find artifact com.github.xiaoymin:knife4j-openapi3-jakarta -->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <version>${knife4j.version}</version>
+        </dependency>
+
+        <!-- Lombok：@Data @Slf4j 等，编译期生效 -->
+        <!--
+            ⚠️ scope 必须是 provided，不能用 <optional>true</optional> + spring-boot-maven-plugin 的 exclude。
+            原因：Lombok 是注解处理器（Annotation Processor），编译期需要它参与才能生成 getter/setter。
+            用 exclude 排除后，编译会报「找不到符号 getXxx()」—— 几十个错误，非常难排查。
+            provided 作用域的含义是：编译期需要、打包时不包含，正是 Lombok 想要的语义。
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!--
+                        保留方法参数名。
+                        MyBatis 在处理多参数方法时，若编译产物不含参数名，
+                        解析 @Param 之外的参数会抛：
+                        "Name for argument of type [java.lang.Long] not specified,
+                         and parameter name information not available via reflection.
+                         Ensure that the compiler uses the '-parameters' flag."
+                        Spring Boot 官方 parent pom 已默认开启，这里显式声明以防万一。
+                    -->
+                    <parameters>true</parameters>
+                    <encoding>UTF-8</encoding>
+                    <annotationProcessorPaths>
+                        <!--
+                            显式声明 Lombok 为注解处理器。
+                            为什么必须写：在 JDK 17+ / Maven 3.10 环境下，
+                            依赖 classpath 自动发现注解处理器的机制会失效，
+                            表现为「找不到符号 getXxx()」—— Lombok 的 getter 全都不生成，
+                            几十个编译错误，且错误信息完全看不出是Lombok 的问题。
+                            显式声明后行为稳定，IDEA 和命令行表现一致。
+                        -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <!--
+                    不需要 exclude lombok。
+                    Lombok 已声明为 provided 作用域，spring-boot-maven-plugin 打包时
+                    只会把 runtime/classpath 范围的依赖打进 jar，provided 天然被排除。
+                    若在此处再 exclude，会导致编译期注解处理器缺失，getter 全部生成失败。
+                -->
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+    </build>
+</project>

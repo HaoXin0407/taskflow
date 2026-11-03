@@ -1,0 +1,89 @@
+/* ==================== 全局样式 ==================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #303133;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-container {
+  padding: 16px;
+}
+
+/* 查询区卡片 */
+.search-card {
+  margin-bottom: 16px;
+}
+
+.search-card :deep(.el-card__body) {
+  padding-bottom: 2px;
+}
+
+.search-card .el-form-item {
+  margin-bottom: 14px;
+}
+
+/* 表格上方工具条 */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* 统计卡片 */
+.stat-card {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.stat-card .stat-label {
+  font-size: 13px;
+  color: #909399;
+  margin-top: 6px;
+}
+
+.chart-box {
+  height: 320px;
+  width: 100%;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c0c4cc;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

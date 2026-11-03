@@ -1,0 +1,35 @@
+# ==================== 本地开发配置模板 ====================
+#
+# ⚠️ 使用方式：
+#   1. 复制本文件为 application-local.yml（同目录）
+#   2. 在 application-local.yml 里填入你的真实配置
+#   3. application-local.yml 已被 .gitignore 忽略，不会被提交
+#   4. 启动时加上 --spring.profiles.active=local 激活
+#
+# 为什么不直接提交真实配置？
+#   数据库密码、JWT 密钥一旦提交到 GitHub，
+#   即使后来删除，历史提交里依然能翻出来（git 的不可变性）。
+#   这是开源项目最常见的安全事故，务必一开始就分离好。
+#
+# 另一个方案：直接用环境变量，不需要这个文件
+#   export DB_USERNAME=root
+#   export DB_PASSWORD=你的密码
+#   export TASKFLOW_JWT_SECRET=你的随机密钥
+#   java -jar app.jar
+#
+# Windows PowerShell 设置环境变量：
+#   $env:DB_USERNAME="root"
+#   $env:DB_PASSWORD="你的密码"
+#   $env:TASKFLOW_JWT_SECRET="你的随机密钥"
+
+spring:
+  datasource:
+    username: root
+    password: 改成你自己的MySQL密码
+
+taskflow:
+  jwt:
+    # 生成随机密钥的命令（建议 32 字节以上）：
+    #   openssl rand -base64 48
+    #   或 Python: import secrets; print(secrets.token_urlsafe(48))
+    secret: 改成你自己的随机长字符串
