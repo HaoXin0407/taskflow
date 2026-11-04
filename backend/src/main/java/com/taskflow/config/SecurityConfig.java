@@ -59,10 +59,12 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/swagger-resources/**",
-            "/favicon.ico",
-            // 调试接口：用于排查「登录后菜单不显示」这类问题，
-            // 需要免登录才能在登录前检查数据。生产环境请移除此项。
-            "/debug/**"
+            "/favicon.ico"
+            // ⚠️ 调试接口 /debug/** 故意不放进免认证白名单。
+            //    它会输出所有用户的角色与权限清单，匿名可访问等于信息泄露。
+            //    现在要求登录后才能调用 —— 本地排查权限问题依然够用
+            //    （先登录拿到 token，再带 token 调用）。
+            //    生产环境如需彻底关闭，可给 DebugController 加 @Profile("dev")。
     };
 
     /**

@@ -191,4 +191,5 @@ taskflow/
 - 无接口限流与熔断
 - 前端零测试，后端仅 2 个测试类（状态机 + 认证）
 - 未提供 Docker / CI 部署配置
-- `/api/debug/**` 在安全白名单内，生产环境需移除或加 `@Profile("dev")`
+- 调试接口 `/api/debug/permission` **需要登录后调用**（不返回敏感字段，仅 id/昵称/部门）。
+  若部署到公网，建议给 `DebugController` 加 `@Profile("dev")` 彻底关闭
